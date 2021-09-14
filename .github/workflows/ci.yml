@@ -2,13 +2,38 @@ name: CI
 
 on:
   push:
-    branches: master
+    branches: [master, win-mingw-build]
   pull_request:
     branches: master
 
 jobs:
+  build-win:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: configure
+      shell: bash
+      env:
+          SWIGLANG: ${{ matrix.SWIGLANG }}
+          CONFIGOPTS: ${{ matrix.CONFIGOPTS }}
+          CC: ${{ matrix.CC }}
+      run: |
+          ./autogen.sh
+          mkdir -p build/build
+          cd build/build
+          ../../configure
+    - name: build
+      shell: bash
+      run: |
+          set -ex
+          cd ${GITHUB_WORKSPACE}/build/build;
+          make -s
+          ./swig -version
+          ./swig -pcreversion
+          
   build:
-
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
