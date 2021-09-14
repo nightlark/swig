@@ -14,20 +14,14 @@ jobs:
       with:
         submodules: recursive
     - name: configure
-      shell: bash
-      env:
-          SWIGLANG: ${{ matrix.SWIGLANG }}
-          CONFIGOPTS: ${{ matrix.CONFIGOPTS }}
-          CC: ${{ matrix.CC }}
       run: |
+          echo "MSYSTEM=$MSYSTEM"
           ./autogen.sh
           mkdir -p build/build
           cd build/build
           ../../configure
     - name: build
-      shell: bash
       run: |
-          set -ex
           cd ${GITHUB_WORKSPACE}/build/build;
           make -s
           ./swig -version
